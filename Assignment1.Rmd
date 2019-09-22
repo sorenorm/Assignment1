@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE, include = TRUE)
 
 library(pacman)
 
-pacman::p_load(tidyverse, data.table, lme4)
+pacman::p_load(tidyverse, data.table, lme4, car, ggplot2, pastecs, psych)
 
 ```
 
@@ -59,8 +59,7 @@ Who likes silence vs. noise best? Males or females? Also in this case you should
 ggplot(df, aes(x=gender, y=sound_level_pref, fill = gender))+
   geom_bar(stat='summary', fun.y = mean, width = 0.5)+
   geom_errorbar(stat = 'summary', fun.data = mean_se, width = 0.2)+
-  labs(x = "Gender", y = "Sound Level Prefered") +
-  theme_minimal()
+  labs(x = "Gender", y = "Sound Level Prefered")
 
 
 ```
@@ -74,7 +73,9 @@ Explain your results in plain terms here:
 Are the breath_hold data normally distributed? Provide visual and numeric support for your answer.
 
 ```{r question3}
-ggplot(df, aes(x=breath_hold)) + geom_histogram(color="darkblue", fill="lightblue", binwidth = 4)
+ggplot(df, aes (x=breath_hold) ) + 
+  geom_histogram(aes(y=..density..), color = "darkblue", fill = "lightblue", binwidth = 5) +
+  stat_function(fun = dnorm, args = list(mean = mean(df$breath_hold, na.rm = TRUE), sd = sd(df$breath_hold, na.rm = TRUE)), colour = "black", size = 1)
 
 
 ```
@@ -89,6 +90,11 @@ Explain your results in plain terms here:
 Are the Balloon reaction time data (balloon and balloon_balance) normally distributed? Provide visual and numeric support for your answer.
 
 ```{r question4}
+ggplot(df, aes(x=balloon)) +
+  geom_histogram(aes(y=..density..), color="darkblue", fill="lightblue", binwidth = 5)+
+  stat_function(fun = dnorm, args = list(mean = mean(df$balloon, na.rm = TRUE), sd = sd(df$balloon, na.rm = TRUE)), colour = "black", size = 1)
+
+
 
 ```
 
@@ -102,6 +108,21 @@ Explain your results in plain terms here:
 Shoe size could tell us something about general body size, which could also be connected to one's ability to hold your breath. In other words we predict that there is a positive relation between shoe size and how long time CogSci students can hold their breath. Try plotting the two sets of data against each other using a scatter plot (hint: both variables are continuous variables). Bonus question: Males and females have different body sizes. Use grouping in your plot to distinguish the relationship between shoe size and holding breath for males and females.
 
 ```{r question5}
+ggplot(df, aes(x=breath_hold, y=shoesize))+
+  geom_point(size=2) + 
+  geom_smooth(method=lm)
+
+
+```
+
+```{r question5_bonus}
+groupedby_gender <- group_by(df, gender)
+
+
+ggplot(groupedby_gender, aes(x=breath_hold, y=shoesize, color=gender)) +
+  geom_point(size=2) +
+  geom_smooth(method=lm, aes(fill=gender))
+
 
 ```
 
