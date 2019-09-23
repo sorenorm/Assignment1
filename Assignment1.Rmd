@@ -34,19 +34,22 @@ Who can hold their breath longer on average, those with right or left ocular dom
 
 
 ```{r question1}
-ocular_dom <- filter(df, ocular_dom =! "Both")
+#Since we are only interested in people with either right or left ocular dominance, I will start by filtering the data, so I only have people with right or left ocular dominance.
+
+filter_ocular_dom <- filter(df, ocular_dom == "Right" | ocular_dom == "Left")
 
 
-ggplot(df, aes(x=ocular_dom, y=breath_hold, fill = ocular_dom))+
-  geom_bar(stat='summary', fun.y = mean, width = 0.5)+
-  geom_errorbar(stat = 'summary', fun.data = mean_se, width = 0.2)+
-  labs(x = "Ocular Dominance", y = "Average Breath Hold")+
+ggplot(filter_ocular_dom, aes(x=ocular_dom, y=breath_hold, fill = ocular_dom)) +
+  geom_bar(stat='summary', fun.y = mean, width = 0.5) +
+  geom_errorbar(stat = 'summary', fun.data = mean_se, width = 0.2) +
+  labs(x = "Ocular Dominance", y = "Average Breath Hold") +
   theme_minimal() + scale_fill_brewer( palette = "Blues")
 
 
-summary_breath_byod <- df %>% 
+summary_breath_byod <- filter_ocular_dom %>% 
   group_by(ocular_dom) %>% 
   summarise(mean(breath_hold), sd(breath_hold),Count=n())
+summary_breath_byod
 ```
 
 Explain your results in plain terms here: 
@@ -60,9 +63,9 @@ It seems as though people with right eye dominance are better at holding their b
 Who likes silence vs. noise best? Males or females? Also in this case you should plot the data using ggplot2 (including error bars), then use the mean() and sd() functions to find mean and standard deviation of the two genders.
 
 ```{r question2}
-ggplot(df, aes(x=gender, y=sound_level_pref, fill = gender))+
-  geom_bar(stat='summary', fun.y = mean, width = 0.5)+
-  geom_errorbar(stat = 'summary', fun.data = mean_se, width = 0.2)+
+ggplot(df, aes(x=gender, y=sound_level_pref, fill = gender)) +
+  geom_bar(stat='summary', fun.y = mean, width = 0.5) +
+  geom_errorbar(stat = 'summary', fun.data = mean_se, width = 0.2) +
   labs(x = "Gender", y = "Sound Level Prefered")
 
 summary_soundlvl_bygender <- df %>% 
@@ -86,7 +89,13 @@ ggplot(df, aes (x=breath_hold) ) +
   geom_histogram(aes(y=..density..), color = "darkblue", fill = "lightblue", binwidth = 5) +
   stat_function(fun = dnorm, args = list(mean = mean(df$breath_hold, na.rm = TRUE), sd = sd(df$breath_hold, na.rm = TRUE)), colour = "black", size = 1)
 
+#do we use describe() or stat.desc()?
+
 describe(df$breath_hold)
+
+round(stat.desc(df$breath_hold, basic = F, norm = T), digits = 3)
+
+qplot(sample=df$breath_hold,stat="qq")
 ```
 
 
@@ -106,6 +115,10 @@ ggplot(df, aes(x=balloon)) +
   stat_function(fun = dnorm, args = list(mean = mean(df$balloon, na.rm = TRUE), sd = sd(df$balloon, na.rm = TRUE)), colour = "black", size = 1)
 
 describe(df$balloon)
+
+round(stat.desc(df$balloon, basic = F, norm = T), digits = 3)
+
+qplot(sample=df$balloon,stat="qq")
 ```
 
 
