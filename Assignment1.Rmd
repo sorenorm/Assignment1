@@ -41,7 +41,9 @@ ggplot(df, aes(x=ocular_dom, y=breath_hold, fill = ocular_dom))+
   theme_minimal() + scale_fill_brewer( palette = "Blues")
 
 
-summary_breath_byod <- df %>% group_by(ocular_dom) %>% summarise(mean(breath_hold), sd(breath_hold),Count=n())
+summary_breath_byod <- df %>% 
+  group_by(ocular_dom) %>% 
+  summarise(mean(breath_hold), sd(breath_hold),Count=n())
 
 summary_breath_byod
 
@@ -77,6 +79,9 @@ ggplot(df, aes (x=breath_hold) ) +
   geom_histogram(aes(y=..density..), color = "darkblue", fill = "lightblue", binwidth = 5) +
   stat_function(fun = dnorm, args = list(mean = mean(df$breath_hold, na.rm = TRUE), sd = sd(df$breath_hold, na.rm = TRUE)), colour = "black", size = 1)
 
+describe(df$breath_hold)
+
+stat.desc(df$breath_hold, basic=FALSE, norm=TRUE)
 
 ```
 
@@ -94,7 +99,9 @@ ggplot(df, aes(x=balloon)) +
   geom_histogram(aes(y=..density..), color="darkblue", fill="lightblue", binwidth = 5)+
   stat_function(fun = dnorm, args = list(mean = mean(df$balloon, na.rm = TRUE), sd = sd(df$balloon, na.rm = TRUE)), colour = "black", size = 1)
 
+describe(df$balloon)
 
+stat.desc(df$balloon, basic=FALSE, norm=TRUE)
 
 ```
 
