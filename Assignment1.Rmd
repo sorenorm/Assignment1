@@ -3,14 +3,16 @@ title: "Portfolio 1 - Experimental Methods 1 2019"
 author: "Søren Orm Hansen"
 date: "9/22/2019"
 output: html_document
+editor_options: 
+  chunk_output_type: inline
 ---
 
-```{r setup}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, include = TRUE)
 
 library(pacman)
 
-pacman::p_load(tidyverse, data.table, lme4, car, ggplot2, pastecs, psych)
+pacman::p_load(tidyverse, data.table, lme4, car, ggplot2, pastecs, psych, plotrix)
 
 ```
 
@@ -36,25 +38,55 @@ Who can hold their breath longer on average, those with right or left ocular dom
 ```{r question1}
 #Since we are only interested in people with either right or left ocular dominance, I will start by filtering the data, so I only have people with right or left ocular dominance.
 
-filter_ocular_dom <- filter(df, ocular_dom == "Right" | ocular_dom == "Left")
+filter_ocular_dom <- filter(df, ocular_dom != "Both")
 
+#barplot with errorbars - average breath hold by ocular dominance
 
-ggplot(filter_ocular_dom, aes(x=ocular_dom, y=breath_hold, fill = ocular_dom)) +
-  geom_bar(stat='summary', fun.y = mean, width = 0.5) +
-  geom_errorbar(stat = 'summary', fun.data = mean_se, width = 0.2) +
+ggplot(filter_ocular_dom,
+       aes(x = ocular_dom, y = breath_hold, fill = ocular_dom)) +
+  geom_bar(
+    stat = 'summary',
+    fun.y = mean,
+    width = 0.5,
+    color = "black"
+  ) +
+  stat_summary(
+    fun.data = mean_cl_normal,
+    geom = "errorbar",
+    color = 'black',
+    width = 0.1
+  ) +
   labs(x = "Ocular Dominance", y = "Average Breath Hold") +
-  theme_minimal() + scale_fill_brewer( palette = "Blues")
+  theme_minimal() + scale_fill_brewer(palette = "Blues") +  
+  labs(title = "Barplot of breath hold by ocular dominance")
 
+#nummeric support
 
-summary_breath_byod <- filter_ocular_dom %>% 
-  group_by(ocular_dom) %>% 
-  summarise(mean(breath_hold), sd(breath_hold),Count=n())
+summary_breath_byod <- filter_ocular_dom %>%
+  group_by(ocular_dom) %>%
+  summarise(
+    mean(breath_hold),
+    sd(breath_hold),
+    sem_max = mean(breath_hold) + std.error(breath_hold)*1.96,
+    sem_min = mean(breath_hold) - std.error(breath_hold)*1.96,
+    Count = n()
+  )
 summary_breath_byod
 ```
 
 Explain your results in plain terms here: 
 
-It seems as though people with right eye dominance are better at holding their breath on average, and people who do not have a prefered eye seem to be the worst on average at holding their breath. But the standard diviation tells us, that this prediction doesn't hold ground #needs to be changed
+Our data tells us, that people with right ocular dominance in our sample can hold their breath longer on average (57.7 seconds) than people in our sample with left ocular dominance (53.4 seconds). 
+
+To know how certain we are of the two averages we've found, we look at the 95% confidence or the interval in which we are 95% certain that the true average of the population is. In the table I have provided the maximum (sem_max) and minimum (sem_min) values for the 95% confidence interval for both right and left ocular dominance. We see that these two intervals overlap. This indicates, that the difference between the two averages is not statistically significant - that the difference is likely to just have occured by chance - if the two sample sizes are of approximately the same size, in this case the two sample sizes (21 and 37) are in the same order of magnitude and therefor close enough to be .
+
+The two bars in the graph indicate the means of the two groups and the 'capital I's' on top of the bars indicate the 95% confidence intervals. Here we see the difference in the two means and the overlapping 95% confidence intervals.
+
+Thus, we cannot conclude from the data in our sample whether people with right eye or left eye dominance can hold their breath longer
+
+
+#We can also see the standard diviation - the standard diviation is found column called "sd(breath_hold)" and it tells us something about the variance in the data - the standard diviation is very big.
+
 
 ---
 
@@ -63,20 +95,52 @@ It seems as though people with right eye dominance are better at holding their b
 Who likes silence vs. noise best? Males or females? Also in this case you should plot the data using ggplot2 (including error bars), then use the mean() and sd() functions to find mean and standard deviation of the two genders.
 
 ```{r question2}
-ggplot(df, aes(x=gender, y=sound_level_pref, fill = gender)) +
-  geom_bar(stat='summary', fun.y = mean, width = 0.5) +
-  geom_errorbar(stat = 'summary', fun.data = mean_se, width = 0.2) +
-  labs(x = "Gender", y = "Sound Level Prefered")
+#barplot with errorbars - prefered sound level by gender
 
-summary_soundlvl_bygender <- df %>% 
-  group_by(gender) %>% 
-  summarise(mean(sound_level_pref), sd(sound_level_pref),Count=n())
+ggplot(df, aes(x = gender, y = sound_level_pref, fill = gender)) +
+  geom_bar(
+    stat = 'summary',
+    fun.y = mean,
+    width = 0.5,
+    color = "black"
+  ) +
+   stat_summary(
+    fun.data = mean_cl_normal,
+    geom = "errorbar",
+    color = 'black',
+    width = 0.1
+  ) +
+  labs(x = "Gender", y = "Sound Level Prefered") + 
+  theme_minimal() +
+  labs(title = "Barplot of prefered sound level by gender")
+
+
+
+
+
+#nummeric support
+
+summary_soundlvl_bygender <- df %>%
+  group_by(gender) %>%
+  summarise(
+    mean(sound_level_pref),
+    sd(sound_level_pref),
+    sem_max = mean(sound_level_pref) + std.error(sound_level_pref)*1.96,
+    sem_min = mean(sound_level_pref) - std.error(sound_level_pref)*1.96,
+    Count = n()
+  )
 summary_soundlvl_bygender
 ```
 
 Explain your results in plain terms here: 
 
-This data might be the most insignificant I have ever seen. On average male participants seem to prefer a sound level about 1.3 'sound level points' above female participants, this is said whith a standard diviation of more that half of the mean... soooo insignificant
+Our data tells us, that the males in our sample prefer a louder sound level (a sound level of 25.6 on a scale of 0 to 100) than females in our sample (a sound level of 24.3 on a scale of 0 to 100) on average. 
+
+To know how certain we are of the two averages we've found, we look at the 95% confidence or the interval in which we are 95% certain that the true average of the population is. In the table I have provided the maximum (sem_max) and minimum (sem_min) values for the 95% confidence interval for both males and females. We see that the 95% confidence interval of males incapsulate the 95% confidence interval for females. This indicates, that the difference between the two averages is not statistically significant - that the difference is likely to just have occured by chance.
+
+The two bars in the graph indicate the means of the two groups and the 'capital I's' on top of the bars indicate the 95% confidence intervals. Here we see the difference in the two means and the 95% confidence intervals of female that incapsulates the 95% confidence interval for males.
+
+Thus, we cannot conclude from the data in our sample whether males or females prefer a louder sound level.
 
 ---
 
@@ -85,23 +149,52 @@ This data might be the most insignificant I have ever seen. On average male part
 Are the breath_hold data normally distributed? Provide visual and numeric support for your answer.
 
 ```{r question3}
-ggplot(df, aes (x=breath_hold) ) + 
-  geom_histogram(aes(y=..density..), color = "darkblue", fill = "lightblue", binwidth = 5) +
-  stat_function(fun = dnorm, args = list(mean = mean(df$breath_hold, na.rm = TRUE), sd = sd(df$breath_hold, na.rm = TRUE)), colour = "black", size = 1)
+ggplot(df, aes (x = breath_hold)) +
+  geom_histogram(
+    aes(y = ..density..),
+    color = "darkblue",
+    fill = "lightblue",
+    binwidth = 3
+  ) +
+  stat_function(
+    fun = dnorm,
+    args = list(
+      mean = mean(df$breath_hold, na.rm = TRUE),
+      sd = sd(df$breath_hold, na.rm = TRUE)
+    ),
+    colour = "black",
+    size = 1
+  ) +
+  labs(title = "Density plot of breath_hold data") + 
+  theme_minimal()
 
-#do we use describe() or stat.desc()?
+  
+ggplot(df, aes(sample = breath_hold)) + 
+  stat_qq() + 
+  stat_qq_line() +
+  labs(title = "QQ plot of breath hold data") + 
+  theme_minimal()
 
-describe(df$breath_hold)
 
 round(stat.desc(df$breath_hold, basic = F, norm = T), digits = 3)
-
-qplot(sample=df$breath_hold,stat="qq")
 ```
-
 
 Explain your results in plain terms here: 
 
-For the data to be normally distributed () the kurtosis (the spikiness) and the skew (if the graph is 'leaning' to one side or the other or not leaning at all) would have to have a value of 0. In this instance I found the value of spikiness to be -0.36 and the value of leaniness to be 0.58. These two values are actually not far from a normal distribution, so I would say that the data is normally distrubuted.
+To access if the breath_hold data is normally distributed, I have provided a density plot of the breath_hold with what the normal curve would look like lain on top of it, a QQ plot of the breath_hold data, and a table with describtive statistics.
+
+Describtive statistics:
+
+
+
+QQ plot
+
+density plot
+
+
+For the data to be normally distributed the graph of the data should be resemble a bell - it should be symetric, not spiky, not leaning to one side or the other, and decreasing smoothly on both sides of the symetry axis. Data from the real world are never perfectly normal, but the data can be close enough to normally ditributed that we still call it normally distributed.    
+
+the kurtosis (the spikiness) and the skew (if the graph is 'leaning' to one side or the other or not leaning at all) would have to have a value of 0. In this instance I found the value of spikiness to be -0.36 and the value of leaniness to be 0.58. These two values are actually not far from a normal distribution, so I would say that the data is normally distrubuted.
 
 ---
 
@@ -110,15 +203,56 @@ For the data to be normally distributed () the kurtosis (the spikiness) and the 
 Are the Balloon reaction time data (balloon and balloon_balance) normally distributed? Provide visual and numeric support for your answer.
 
 ```{r question4}
-ggplot(df, aes(x=balloon)) +
-  geom_histogram(aes(y=..density..), color="darkblue", fill="lightblue", binwidth = 5)+
-  stat_function(fun = dnorm, args = list(mean = mean(df$balloon, na.rm = TRUE), sd = sd(df$balloon, na.rm = TRUE)), colour = "black", size = 1)
+ggplot(df, aes(x = balloon)) +
+  geom_histogram(
+    aes(y = ..density..),
+    color = "darkblue",
+    fill = "lightblue",
+    binwidth = 3
+  ) +
+  stat_function(
+    fun = dnorm,
+    args = list(
+      mean = mean(df$balloon, na.rm = TRUE),
+      sd = sd(df$balloon, na.rm = TRUE)
+    ),
+    colour = "black",
+    size = 1
+  ) + labs(title = "Density plot of balloon inflation data with normal line") + 
+  theme_minimal()
 
-describe(df$balloon)
+ggplot(df, aes(x = balloon_balance)) +
+  geom_histogram(
+    aes(y = ..density..),
+    color = "darkblue",
+    fill = "lightblue",
+    binwidth = 3
+  ) +
+  stat_function(
+    fun = dnorm,
+    args = list(
+      mean = mean(df$balloon, na.rm = TRUE),
+      sd = sd(df$balloon, na.rm = TRUE)
+    ),
+    colour = "black",
+    size = 1
+  ) + labs(title = "Density plot of balloon balance data with normal line") + 
+  theme_minimal()
+
+ggplot(df, aes(sample = balloon)) + 
+  stat_qq() + 
+  stat_qq_line() +
+  labs(title = "QQ plot of balloon inflation data with normal line")
+
+ggplot(df, aes(sample = balloon_balance)) + 
+  stat_qq() + 
+  stat_qq_line() +
+  labs(title = "QQ plot of balloon balance data with normal line")
 
 round(stat.desc(df$balloon, basic = F, norm = T), digits = 3)
 
-qplot(sample=df$balloon,stat="qq")
+round(stat.desc(df$balloon_balance, basic = F, norm = T), digits = 3)
+
 ```
 
 
@@ -131,9 +265,10 @@ Explain your results in plain terms here:
 Shoe size could tell us something about general body size, which could also be connected to one's ability to hold your breath. In other words we predict that there is a positive relation between shoe size and how long time CogSci students can hold their breath. Try plotting the two sets of data against each other using a scatter plot (hint: both variables are continuous variables). Bonus question: Males and females have different body sizes. Use grouping in your plot to distinguish the relationship between shoe size and holding breath for males and females.
 
 ```{r question5}
-ggplot(df, aes(x=breath_hold, y=shoesize))+
-  geom_point(size=2) + 
-  geom_smooth(method=lm)
+ggplot(df, aes(x = breath_hold, y = shoesize)) +
+  geom_point(size = 2) +
+  geom_smooth(method = lm) +
+  labs(title = "Scatter plot - Shoesize by breath hold")
 
 
 ```
@@ -142,9 +277,11 @@ ggplot(df, aes(x=breath_hold, y=shoesize))+
 groupedby_gender <- group_by(df, gender)
 
 
-ggplot(groupedby_gender, aes(x=breath_hold, y=shoesize, color=gender)) +
-  geom_point(size=2) +
-  geom_smooth(method=lm, aes(fill=gender))
+ggplot(groupedby_gender,
+       aes(x = breath_hold, y = shoesize, color = gender)) +
+  geom_point(size = 2) +
+  geom_smooth(method = lm, aes(fill = gender)) +
+  labs(title = "Scatter plot - Shoesize by breath hold seperated by gender")
 
 
 ```
