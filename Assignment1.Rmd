@@ -63,7 +63,7 @@ ggplot(filter_ocular_dom,
        y = "Breath Hold"
   )
 
-#finding the mean, standard deviation, the 95% confidence interval, and the numbers of observations in each category
+#Finding the mean, standard deviation, the 95% confidence interval, and the numbers of observations in each category
 
 summary_breath_byod <- filter_ocular_dom %>%
   group_by(ocular_dom) %>%
@@ -99,7 +99,7 @@ Thus, we cannot conclude from the data in our sample whether people with right e
 Who likes silence vs. noise best? Males or females? Also in this case you should plot the data using ggplot2 (including error bars), then use the mean() and sd() functions to find mean and standard deviation of the two genders.
 
 ```{r question2}
-#boxplot with mean and errorbars - prefered sound level by gender
+#Boxplot with mean and errorbars - prefered sound level by gender
 
 ggplot(df,
        aes(x = gender, y = sound_level_pref, fill = gender)) +
@@ -122,7 +122,7 @@ ggplot(df,
        x = "Gender"
   )
 
-#finding the mean, standard deviation, the 95% confidence interval, and the numbers of observations in each category
+#Finding the mean, standard deviation, the 95% confidence interval, and the numbers of observations in each category
 
 summary_soundlvl_bygender <- df %>%
   group_by(gender) %>%
@@ -156,7 +156,7 @@ Thus, we cannot conclude from the data in our sample whether males or females pr
 Are the breath_hold data normally distributed? Provide visual and numeric support for your answer.
 
 ```{r question3}
-#density plot - breath hold data
+#Density plot - breath hold data
 
 ggplot(df, aes (x = breath_hold)) +
   geom_histogram(
@@ -191,6 +191,7 @@ ggplot(df, aes(sample = breath_hold)) +
   ) + 
   theme_minimal()
 
+#Numerical parameters - breath_hold data
 
 round(stat.desc(df$breath_hold, basic = F, norm = T), digits = 2)
 ```
@@ -225,6 +226,8 @@ To sum up the assesments of normallity above: the data is approximately normal.
 Are the Balloon reaction time data (balloon and balloon_balance) normally distributed? Provide visual and numeric support for your answer.
 
 ```{r question4}
+#Density plot - balloon data
+
 ggplot(df, aes(x = balloon)) +
   geom_vline(data=df, 
              aes(xintercept = mean(balloon)+3*sd(balloon)), 
@@ -250,6 +253,8 @@ ggplot(df, aes(x = balloon)) +
        x = "Balloon Inflation Time (sec)"
        ) + 
   theme_minimal()
+
+#Density plot - balloon_ballance data
 
 ggplot(df, aes(x = balloon_balance)) +
   geom_vline(data=df, 
@@ -277,6 +282,8 @@ ggplot(df, aes(x = balloon_balance)) +
            ) + 
   theme_minimal()
 
+#QQ plot - balloon data
+
 ggplot(df, aes(sample = balloon)) + 
   stat_qq() + 
   stat_qq_line() +
@@ -285,6 +292,8 @@ ggplot(df, aes(sample = balloon)) +
        x = "Expected value"
        ) +
   theme_minimal()
+
+#QQ plot - balloon_balance data
 
 ggplot(df, aes(sample = balloon_balance)) + 
   stat_qq() + 
@@ -295,7 +304,11 @@ ggplot(df, aes(sample = balloon_balance)) +
        ) +
   theme_minimal()
 
+#Numerical parameters - balloon data
+
 round(stat.desc(df$balloon, basic = F, norm = T), digits = 2)
+
+#Numerical parameters - balloon_balance data
 
 round(stat.desc(df$balloon_balance, basic = F, norm = T), digits = 2)
 
@@ -348,6 +361,8 @@ To sum up the assesments of normallity above: the data is not normal.
 Shoe size could tell us something about general body size, which could also be connected to one's ability to hold your breath. In other words we predict that there is a positive relation between shoe size and how long time CogSci students can hold their breath. Try plotting the two sets of data against each other using a scatter plot (hint: both variables are continuous variables). Bonus question: Males and females have different body sizes. Use grouping in your plot to distinguish the relationship between shoe size and holding breath for males and females.
 
 ```{r question5}
+#Scatter plot - shoesize by breath_hold
+
 ggplot(df, aes(x = breath_hold, y = shoesize)) +
   geom_point(size = 2) +
   geom_smooth(method = lm) +
@@ -357,12 +372,13 @@ ggplot(df, aes(x = breath_hold, y = shoesize)) +
        ) + 
   theme_minimal()
 
+#Bonus question
 
-```
+#Grouping the data by gender
 
-```{r question5_bonus}
 groupedby_gender <- group_by(df, gender)
 
+#Scatter plot - shoesize by breath_hold grouped by gender
 
 ggplot(groupedby_gender,
        aes(x = breath_hold, y = shoesize, shape = gender)) +
@@ -376,7 +392,6 @@ ggplot(groupedby_gender,
 
 
 ```
-
 
 Explain your results in plain terms here: 
 
