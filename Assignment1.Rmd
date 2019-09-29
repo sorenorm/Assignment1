@@ -40,7 +40,7 @@ Who can hold their breath longer on average, those with right or left ocular dom
 
 filter_ocular_dom <- filter(df, ocular_dom != "Both")
 
-#barplot with errorbars - average breath hold by ocular dominance
+#barplot with SEM-errorbars - average breath hold by ocular dominance
 
 ggplot(filter_ocular_dom,
        aes(x = ocular_dom, y = breath_hold, fill = ocular_dom)) +
@@ -48,19 +48,22 @@ ggplot(filter_ocular_dom,
     stat = 'summary',
     fun.y = mean,
     width = 0.5,
-    color = "black"
+    color = "Black"
   ) +
   stat_summary(
     fun.data = mean_cl_normal,
     geom = "errorbar",
-    color = 'black',
+    color = "Black",
     width = 0.1
   ) +
-  labs(x = "Ocular Dominance", y = "Average Breath Hold") +
-  theme_minimal() + scale_fill_brewer(palette = "Blues") +  
-  labs(title = "Barplot of breath hold by ocular dominance")
+  theme_minimal() + 
+  scale_fill_brewer(palette = "Blues") +  
+  labs(title = "Barplot of average breath hold by ocular dominance", 
+       x = "Ocular Dominance", 
+       y = "Average Breath Hold"
+  )
 
-#nummeric support
+#finding the mean, standard deviation, the 95% confidence interval, and the numbers of observations in each category
 
 summary_breath_byod <- filter_ocular_dom %>%
   group_by(ocular_dom) %>%
@@ -78,7 +81,7 @@ Explain your results in plain terms here:
 
 Our data tells us, that people with right ocular dominance in our sample can hold their breath longer on average (57.7 seconds) than people in our sample with left ocular dominance (53.4 seconds). 
 
-To know how certain we are of the two averages we've found, we look at the 95% confidence or the interval in which we are 95% certain that the true average of the population is. In the table I have provided the maximum (sem_max) and minimum (sem_min) values for the 95% confidence interval for both right and left ocular dominance. We see that these two intervals overlap. This indicates, that the difference between the two averages is not statistically significant - that the difference is likely to just have occured by chance - if the two sample sizes are of approximately the same size, in this case the two sample sizes (21 and 37) are in the same order of magnitude and therefor close enough to be .
+To know how certain we are of the two averages we've found, we look at the 95% confidence or the interval in which we are 95% certain that the true average of the population is. In the table I have provided the maximum (sem_max) and minimum (sem_min) values for the 95% confidence interval for both right and left ocular dominance. We see that these two intervals overlap. This indicates, that the difference between the two averages is not statistically significant - that the difference is likely to just have occured by chance.
 
 The two bars in the graph indicate the means of the two groups and the 'capital I's' on top of the bars indicate the 95% confidence intervals. Here we see the difference in the two means and the overlapping 95% confidence intervals.
 
@@ -87,6 +90,7 @@ Thus, we cannot conclude from the data in our sample whether people with right e
 
 #We can also see the standard diviation - the standard diviation is found column called "sd(breath_hold)" and it tells us something about the variance in the data - the standard diviation is very big.
 
+#Do we use the z or t test when the sample size is 21?
 
 ---
 
@@ -95,30 +99,30 @@ Thus, we cannot conclude from the data in our sample whether people with right e
 Who likes silence vs. noise best? Males or females? Also in this case you should plot the data using ggplot2 (including error bars), then use the mean() and sd() functions to find mean and standard deviation of the two genders.
 
 ```{r question2}
-#barplot with errorbars - prefered sound level by gender
+#boxplot with mean and errorbars - prefered sound level by gender
 
 ggplot(df, aes(x = gender, y = sound_level_pref, fill = gender)) +
-  geom_bar(
-    stat = 'summary',
+  geom_boxplot(width = 0.5) + stat_summary(
     fun.y = mean,
-    width = 0.5,
-    color = "black"
-  ) +
-   stat_summary(
+    geom = "point",
+    shape = 23,
+    colour = "Black"
+  ) + 
+  stat_summary(
     fun.data = mean_cl_normal,
     geom = "errorbar",
-    color = 'black',
+    colour = "Black",
     width = 0.1
   ) +
-  labs(x = "Gender", y = "Sound Level Prefered") + 
+  labs(title = "Boxplot of prefered sound level by gender", 
+       y = "Prefered Sound Level (0-100)", 
+       x = "Gender"
+  ) + 
   theme_minimal() +
-  labs(title = "Barplot of prefered sound level by gender")
+  scale_fill_brewer(palette = "Blues") 
 
 
-
-
-
-#nummeric support
+#finding the mean, standard deviation, the 95% confidence interval, and the numbers of observations in each category
 
 summary_soundlvl_bygender <- df %>%
   group_by(gender) %>%
@@ -149,6 +153,8 @@ Thus, we cannot conclude from the data in our sample whether males or females pr
 Are the breath_hold data normally distributed? Provide visual and numeric support for your answer.
 
 ```{r question3}
+#density plot - breath hold data
+
 ggplot(df, aes (x = breath_hold)) +
   geom_histogram(
     aes(y = ..density..),
@@ -165,18 +171,25 @@ ggplot(df, aes (x = breath_hold)) +
     colour = "black",
     size = 1
   ) +
-  labs(title = "Density plot of breath_hold data") + 
+  labs(title = "Density plot of breath_hold data", 
+       y = "Density", 
+       x = "Breath hold (sec)"
+  ) + 
   theme_minimal()
 
+#QQ plot of breath hold data
   
 ggplot(df, aes(sample = breath_hold)) + 
   stat_qq() + 
   stat_qq_line() +
-  labs(title = "QQ plot of breath hold data") + 
+  labs(title = "QQ plot of breath hold data", 
+       y = "Observed value", 
+       x = "Expected value"
+  ) + 
   theme_minimal()
 
 
-round(stat.desc(df$breath_hold, basic = F, norm = T), digits = 3)
+round(stat.desc(df$breath_hold, basic = F, norm = T), digits = 2)
 ```
 
 Explain your results in plain terms here: 
@@ -184,12 +197,20 @@ Explain your results in plain terms here:
 To access if the breath_hold data is normally distributed, I have provided a density plot of the breath_hold with what the normal curve would look like lain on top of it, a QQ plot of the breath_hold data, and a table with describtive statistics.
 
 Describtive statistics:
+For a data set to be normally distributed a couple of numerical parameters have to aply to the set. The ones I will focus on here are: the mean (average) and the median (the value that splits the data in two equal halfs) have to be (approximately) equal, the skewness and kurtosis devided by two times the standard error (skew.2SE) has to be within the interval from -1 to 1 preferably as close to zero as posible, and the p-value of the Shapiro-Wilk test has to be greater than 0.05.
 
+In the breath_hold data we have found the median to be 51.91 seconds and the mean to be 55.77 seconds. This is almost
 
+QQ-plot:
+The quantile-quantile plot, or the QQ-plot, compares data colected in an experiment with the theoretically expected distribution of that data if it was normally distributed. If a data set is normally distributed the QQ-plot wil resemple a diagonal line. 
 
-QQ plot
+On the QQ-plot of the breath_hold data we see that the data follows the diagonal line indicating the theoretical values for a normally distributed data set. The QQ-plot of the data suggests that the breath_hold data is normally distributed.
 
-density plot
+Density plot:
+On the density plot we see that the breath_hold data is slightly positively skewed, this will always be the case for time-data, because we cannot find any negative data - so zero will be a fixed lower boundry, while there is no fixed upper boundry. 
+
+However, the black line on the density plot shows what a normally distributed data set with the same mean and standard diviation would look like. We see that the breath_hold data (the vertical bars on the density plot) roughly follows this line. This suggests that the breath_hold data is normally distributed.
+
 
 
 For the data to be normally distributed the graph of the data should be resemble a bell - it should be symetric, not spiky, not leaning to one side or the other, and decreasing smoothly on both sides of the symetry axis. Data from the real world are never perfectly normal, but the data can be close enough to normally ditributed that we still call it normally distributed.    
