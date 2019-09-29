@@ -60,7 +60,7 @@ ggplot(filter_ocular_dom,
   scale_fill_brewer(palette = "Blues") +  
   labs(title = "Barplot of average breath hold by ocular dominance", 
        x = "Ocular Dominance", 
-       y = "Average Breath Hold"
+       y = "Breath Hold"
   )
 
 #finding the mean, standard deviation, the 95% confidence interval, and the numbers of observations in each category
@@ -70,8 +70,8 @@ summary_breath_byod <- filter_ocular_dom %>%
   summarise(
     mean(breath_hold),
     sd(breath_hold),
-    sem_max = mean(breath_hold) + std.error(breath_hold)*1.96,
-    sem_min = mean(breath_hold) - std.error(breath_hold)*1.96,
+    SEM_max = mean(breath_hold) + std.error(breath_hold)*1.96,
+    SEM_min = mean(breath_hold) - std.error(breath_hold)*1.96,
     Count = n()
   )
 summary_breath_byod
@@ -81,14 +81,14 @@ Explain your results in plain terms here:
 
 Our data tells us, that people with right ocular dominance in our sample can hold their breath longer on average (57.7 seconds) than people in our sample with left ocular dominance (53.4 seconds). 
 
-To know how certain we are of the two averages we've found, we look at the 95% confidence or the interval in which we are 95% certain that the true average of the population is. In the table I have provided the maximum (sem_max) and minimum (sem_min) values for the 95% confidence interval for both right and left ocular dominance. We see that these two intervals overlap. This indicates, that the difference between the two averages is not statistically significant - that the difference is likely to just have occured by chance.
+To know how certain we are of the two averages we've found, we look at the 95% confidence or the interval in which we are 95% certain that the true average of the population is. In the table I have provided the maximum (SEM_max) and minimum (SEM_min) values for the 95% confidence interval for both right and left ocular dominance. We see that these two intervals overlap. This indicates, that the difference between the two averages is not statistically significant - that the difference is likely to just have occured by chance.
 
 The two bars in the graph indicate the means of the two groups and the 'capital I's' on top of the bars indicate the 95% confidence intervals. Here we see the difference in the two means and the overlapping 95% confidence intervals.
 
 Thus, we cannot conclude from the data in our sample whether people with right eye or left eye dominance can hold their breath longer
 
 
-#We can also see the standard diviation - the standard diviation is found column called "sd(breath_hold)" and it tells us something about the variance in the data - the standard diviation is very big.
+#The standard diviation was found to be 21.29 for people with left ocular dominance and 20.63 for people with right ocular dominance. The standard diviation tells us something about the variance, and in this instance it is quite large.
 
 #Do we use the z or t test when the sample size is 21?
 
@@ -101,36 +101,37 @@ Who likes silence vs. noise best? Males or females? Also in this case you should
 ```{r question2}
 #boxplot with mean and errorbars - prefered sound level by gender
 
-ggplot(df, aes(x = gender, y = sound_level_pref, fill = gender)) +
-  geom_boxplot(width = 0.5) + stat_summary(
+ggplot(df,
+       aes(x = gender, y = sound_level_pref, fill = gender)) +
+  geom_bar(
+    stat = 'summary',
     fun.y = mean,
-    geom = "point",
-    shape = 23,
-    colour = "Black"
-  ) + 
+    width = 0.5,
+    color = "Black"
+  ) +
   stat_summary(
     fun.data = mean_cl_normal,
     geom = "errorbar",
-    colour = "Black",
+    color = "Black",
     width = 0.1
   ) +
+  theme_minimal() + 
+  scale_fill_brewer(palette = "Blues") +  
   labs(title = "Boxplot of prefered sound level by gender", 
        y = "Prefered Sound Level (0-100)", 
        x = "Gender"
-  ) + 
-  theme_minimal() +
-  scale_fill_brewer(palette = "Blues") 
-
+  )
 
 #finding the mean, standard deviation, the 95% confidence interval, and the numbers of observations in each category
 
 summary_soundlvl_bygender <- df %>%
   group_by(gender) %>%
   summarise(
-    mean(sound_level_pref),
-    sd(sound_level_pref),
-    sem_max = mean(sound_level_pref) + std.error(sound_level_pref)*1.96,
-    sem_min = mean(sound_level_pref) - std.error(sound_level_pref)*1.96,
+    Mean = mean(sound_level_pref),
+    SD =sd(sound_level_pref),
+    Median = median(sound_level_pref),
+    SEM_max = mean(sound_level_pref) + std.error(sound_level_pref)*1.96,
+    SEM_min = mean(sound_level_pref) - std.error(sound_level_pref)*1.96,
     Count = n()
   )
 summary_soundlvl_bygender
@@ -140,11 +141,13 @@ Explain your results in plain terms here:
 
 Our data tells us, that the males in our sample prefer a louder sound level (a sound level of 25.6 on a scale of 0 to 100) than females in our sample (a sound level of 24.3 on a scale of 0 to 100) on average. 
 
-To know how certain we are of the two averages we've found, we look at the 95% confidence or the interval in which we are 95% certain that the true average of the population is. In the table I have provided the maximum (sem_max) and minimum (sem_min) values for the 95% confidence interval for both males and females. We see that the 95% confidence interval of males incapsulate the 95% confidence interval for females. This indicates, that the difference between the two averages is not statistically significant - that the difference is likely to just have occured by chance.
+To know how certain we are of the two averages we've found, we look at the 95% confidence or the interval in which we are 95% certain that the true average of the population is. In the table I have provided the maximum (SEM_max) and minimum (SEM_min) values for the 95% confidence interval for both males and females. We see that the 95% confidence interval of males incapsulate the 95% confidence interval for females. This indicates, that the difference between the two averages is not statistically significant - that the difference is likely to just have occured by chance.
+
+We see that the medians (the value that splits the data in two equal halfs) for both males and female is 20. These values is not biased by skew and outliers as the means are, and suggests an even more equal preference of sound level. 
 
 The two bars in the graph indicate the means of the two groups and the 'capital I's' on top of the bars indicate the 95% confidence intervals. Here we see the difference in the two means and the 95% confidence intervals of female that incapsulates the 95% confidence interval for males.
 
-Thus, we cannot conclude from the data in our sample whether males or females prefer a louder sound level.
+Thus, we cannot conclude from the data in our sample whether males or females prefer a louder sound level. Additionally, our data only look at 1st semester Cognitive Science students it AU, Which might or might not be representative for the entire population of males and female.
 
 ---
 
@@ -183,7 +186,7 @@ ggplot(df, aes(sample = breath_hold)) +
   stat_qq() + 
   stat_qq_line() +
   labs(title = "QQ plot of breath hold data", 
-       y = "Observed value", 
+       y = "Breath hold (sec)", 
        x = "Expected value"
   ) + 
   theme_minimal()
@@ -194,12 +197,14 @@ round(stat.desc(df$breath_hold, basic = F, norm = T), digits = 2)
 
 Explain your results in plain terms here: 
 
-To access if the breath_hold data is normally distributed, I have provided a density plot of the breath_hold with what the normal curve would look like lain on top of it, a QQ plot of the breath_hold data, and a table with describtive statistics.
+To access if the breath_hold data is normally distributed, I have provided a density plot of the breath_hold with a normal curve laid on top of it, a QQ plot of the breath_hold data, and a table with with a variety of numerical parameters.
 
-Describtive statistics:
-For a data set to be normally distributed a couple of numerical parameters have to aply to the set. The ones I will focus on here are: the mean (average) and the median (the value that splits the data in two equal halfs) have to be (approximately) equal, the skewness and kurtosis devided by two times the standard error (skew.2SE) has to be within the interval from -1 to 1 preferably as close to zero as posible, and the p-value of the Shapiro-Wilk test has to be greater than 0.05.
+Numerical Parameters:
+For a data set to be normally distributed a couple of numerical parameters have to aply to the set. The ones I will focus on here are: the mean (average) and the median (the value that splits the data in two equal halfs) have to be (approximately) equal, the skewness (if the data is 'leaning' to one side or the other compared to a normal distribution) and kurtosis (if the tails of the data have more or fewer observations than what is to be expected in a normal distribution) devided by two times the standard error (skew.2SE and kurt.2SE) has to be within the interval from -1 to 1 preferably as close to zero as posible, and the p-value of the Shapiro-Wilk test (normtest.p) has to be greater than 0.05. The skew.2SE, the kurt.2SE, and the normtest.p values is to be interpreted causiously when the number of observations in a data set is above 30.
 
-In the breath_hold data we have found the median to be 51.91 seconds and the mean to be 55.77 seconds. This is almost
+In the breath_hold data we have found the median to be 51.91 seconds and the mean to be 55.77 seconds. This difference implies a positive skew in the data and/or posibly one or more outliers larger that the median. But diviance from the theoretical values are to be expected and the difference is not too big for it determine if the data is normally distributed or not.
+The skew.2SE has a value of 0.95, which is indicate that the data is normally distributed. The kurt.2SE has a value of -0.30, which is indicate that the data is normally distributed. The normtest.p has a value of 0.04, which is just below the acceptable level. This indicates that the data is not normally distributed. 
+Because our data set has more than 30 observations (62 in fact) we cannot conclude anything definitively from the skew.2SE, the kurt.2SE, and the normtest.p values, but together with the mean-median difference these numbers suggest that the data is approximately normally distributed with some positive skew and/or outliers.
 
 QQ-plot:
 The quantile-quantile plot, or the QQ-plot, compares data colected in an experiment with the theoretically expected distribution of that data if it was normally distributed. If a data set is normally distributed the QQ-plot wil resemple a diagonal line. 
@@ -209,13 +214,9 @@ On the QQ-plot of the breath_hold data we see that the data follows the diagonal
 Density plot:
 On the density plot we see that the breath_hold data is slightly positively skewed, this will always be the case for time-data, because we cannot find any negative data - so zero will be a fixed lower boundry, while there is no fixed upper boundry. 
 
-However, the black line on the density plot shows what a normally distributed data set with the same mean and standard diviation would look like. We see that the breath_hold data (the vertical bars on the density plot) roughly follows this line. This suggests that the breath_hold data is normally distributed.
+However, the black line on the density plot shows what a normally distributed data set with the same mean and standard diviation would look like. We see that the breath_hold data roughly follow this line. This suggests that the breath_hold data is normally distributed.
 
-
-
-For the data to be normally distributed the graph of the data should be resemble a bell - it should be symetric, not spiky, not leaning to one side or the other, and decreasing smoothly on both sides of the symetry axis. Data from the real world are never perfectly normal, but the data can be close enough to normally ditributed that we still call it normally distributed.    
-
-the kurtosis (the spikiness) and the skew (if the graph is 'leaning' to one side or the other or not leaning at all) would have to have a value of 0. In this instance I found the value of spikiness to be -0.36 and the value of leaniness to be 0.58. These two values are actually not far from a normal distribution, so I would say that the data is normally distrubuted.
+To sum up the assesments of normallity above: the data is approximately normal.
 
 ---
 
@@ -225,6 +226,10 @@ Are the Balloon reaction time data (balloon and balloon_balance) normally distri
 
 ```{r question4}
 ggplot(df, aes(x = balloon)) +
+  geom_vline(data=df, 
+             aes(xintercept = mean(balloon)+3*sd(balloon)), 
+             colour="black", 
+             linetype="dotted") +
   geom_histogram(
     aes(y = ..density..),
     color = "darkblue",
@@ -239,10 +244,18 @@ ggplot(df, aes(x = balloon)) +
     ),
     colour = "black",
     size = 1
-  ) + labs(title = "Density plot of balloon inflation data with normal line") + 
+  ) + 
+  labs(title = "Density Plot of Balloon Inflation Times with Normal Line", 
+       y = "Density", 
+       x = "Balloon Inflation Time (sec)"
+       ) + 
   theme_minimal()
 
 ggplot(df, aes(x = balloon_balance)) +
+  geom_vline(data=df, 
+             aes(xintercept = mean(balloon)+3*sd(balloon)), 
+             colour="black", 
+             linetype="dotted") +
   geom_histogram(
     aes(y = ..density..),
     color = "darkblue",
@@ -257,27 +270,76 @@ ggplot(df, aes(x = balloon_balance)) +
     ),
     colour = "black",
     size = 1
-  ) + labs(title = "Density plot of balloon balance data with normal line") + 
+  ) + 
+  labs(title = "Density Plot of Balloon Balance Times with Normal Line",
+           y = "Density", 
+           x = "Balloon Ballance Time (sec)"
+           ) + 
   theme_minimal()
 
 ggplot(df, aes(sample = balloon)) + 
   stat_qq() + 
   stat_qq_line() +
-  labs(title = "QQ plot of balloon inflation data with normal line")
+  labs(title = "QQ plot of Balloon Inflation Times with Normal Line",
+       y = "Balloon Inflation Time (sec)", 
+       x = "Expected value"
+       ) +
+  theme_minimal()
 
 ggplot(df, aes(sample = balloon_balance)) + 
   stat_qq() + 
   stat_qq_line() +
-  labs(title = "QQ plot of balloon balance data with normal line")
+  labs(title = "QQ plot of Balloon Balance Times with Normal Line",
+       y = "Balloon Ballance Time (sec)", 
+       x = "Expected value"
+       ) +
+  theme_minimal()
 
-round(stat.desc(df$balloon, basic = F, norm = T), digits = 3)
+round(stat.desc(df$balloon, basic = F, norm = T), digits = 2)
 
-round(stat.desc(df$balloon_balance, basic = F, norm = T), digits = 3)
+round(stat.desc(df$balloon_balance, basic = F, norm = T), digits = 2)
 
 ```
 
 
 Explain your results in plain terms here: 
+
+Balloon Inflation Data:
+
+To access if the balloon inflation data is normally distributed, I have provided a density plot of the balloon inflation data with a normal curve laid on top of it, a QQ plot of the balloon inflation data, and a table with a variety of numerical parameters.
+
+Numerical Parameters:
+In the balloon inflation data we have found the median to be 22.50 seconds and the mean to be 33.68 seconds. This difference implies a positive skew in the data and/or posibly one or more outliers larger that the median. Diviance from the theoretical values are to be expected, but the difference is fairly large indicating that the data is not normally distributed.
+The skew.2SE has a value of 3.31, which is indicate that the data has a heavy positive skew. The kurt.2SE has a value of -2.38, which is indicate that the data is not normally distributed. The normtest.p has a value of 0.00, which is below the acceptable level for the data to be normally distributed. This indicates that the data is not normally distributed. 
+Because our data set has more than 30 observations (62 in fact) we cannot conclude anything definitively from the skew.2SE, the kurt.2SE, and the normtest.p values, but together with the mean-median difference these numbers suggest that the data is not normally distributed and with positive skew and/or outliers.
+
+QQ-plot:
+On the QQ-plot of the balloon inflation data we see that the data follows the diagonal line indicating the theoretical values for a normally distributed data set until just below an expected value of 1 and an inflation time of 40. From there on out the balloon inflation data deviates strongly from the expected values. The QQ-plot of the data suggests that the balloon inflation data is not normally distributed.
+
+Density plot:
+On the density plot we see a large portion of the data located below 50 seconds that actually look quite normally distributed, some observations from 50 seconds to 119 seconds, and a large amount of observations at 120 seconds (indication the time cap of the task). The density plot includes a vertical dotted line. All observations that fall above this line are outliers (the mean plus three standard diviations). There are no outliers in this data set. The black curve on the density plot shows what a normally distributed data set with the same mean and standard diviation would look like. We see that the balloon inflation data do not follow this line. 
+This suggests that the balloon inflation data is not normally distributed.
+
+To sum up the assesments of normallity above: the data is not normal.
+
+
+Balloon Balance Data:
+
+To access if the balloon balance data is normally distributed, I have provided a density plot of the balloon inflation data with a normal curve laid on top of it, a QQ plot of the balloon balance data, and a table with a variety of numerical parameters.
+
+Numerical Parameters:
+In the balloon balance data we have found the median to be 9.00 seconds and the mean to be 33.49 seconds. This difference implies a positive skew in the data and/or posibly one or more outliers larger that the median. Diviance from the theoretical values are to be expected, but the difference is very large indicating that the data is not normally distributed.
+The skew.2SE has a value of 2.02, which is indicate that the data has a heavy positive skew. The kurt.2SE has a value of -0.25, which is indicate that the data has a close to normal kurtosis and is normally distributed. The normtest.p has a value of 0.00, which is below the acceptable level for the data to be normally distributed. This indicates that the data is not normally distributed. 
+Because our data set has more than 30 observations (62 in fact) we cannot conclude anything definitively from the skew.2SE, the kurt.2SE, and the normtest.p values, but together with the mean-median difference these numbers suggest that the data is not normally distributed and with positive skew and/or outliers.
+
+QQ-plot:
+On the QQ-plot of the balloon balance data we see that the data does not follow the diagonal line at all indicating that the data is not normally distributed. The QQ-plot of the data suggests that the balloon balance data is not normally distributed.
+
+Density plot:
+On the density plot we see many observations close to 0 seconds, few observations from 25 seconds to 119 seconds, and a spike of observations at 120 seconds (the time cap of the task). The density plot includes a vertical dotted line. All observations that fall above this line are outliers (the mean plus three standard diviations). There are no outliers in this data set. The black curve on the density plot shows what a normally distributed data set with the same mean and standard diviation would look like. We see that the balloon balance data do not follow this line. 
+This suggests that the balloon balance data is not normally distributed.
+
+To sum up the assesments of normallity above: the data is not normal.
 
 ---
 
@@ -289,7 +351,11 @@ Shoe size could tell us something about general body size, which could also be c
 ggplot(df, aes(x = breath_hold, y = shoesize)) +
   geom_point(size = 2) +
   geom_smooth(method = lm) +
-  labs(title = "Scatter plot - Shoesize by breath hold")
+  labs(title = "Scatter Plot - shoesize by breath_hold",
+       y = "Shoesize", 
+       x = "Breath Hold Times (sec)"
+       ) + 
+  theme_minimal()
 
 
 ```
@@ -299,10 +365,14 @@ groupedby_gender <- group_by(df, gender)
 
 
 ggplot(groupedby_gender,
-       aes(x = breath_hold, y = shoesize, color = gender)) +
+       aes(x = breath_hold, y = shoesize, shape = gender)) +
   geom_point(size = 2) +
-  geom_smooth(method = lm, aes(fill = gender)) +
-  labs(title = "Scatter plot - Shoesize by breath hold seperated by gender")
+  geom_smooth(method = lm) +
+  labs(title = "Scatter plot - shoesize by breath_hold Seperated by gender", 
+       y = "Shoesize", 
+       x = "Breath Hold Times (sec)"
+       ) +
+  theme_minimal()
 
 
 ```
