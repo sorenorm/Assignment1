@@ -363,12 +363,12 @@ Shoe size could tell us something about general body size, which could also be c
 ```{r question5}
 #Scatter plot - shoesize by breath_hold
 
-ggplot(df, aes(x = breath_hold, y = shoesize)) +
+ggplot(df, aes(x = shoesize, y = breath_hold)) +
   geom_point(size = 2) +
   geom_smooth(method = lm) +
   labs(title = "Scatter Plot - shoesize by breath_hold",
-       y = "Shoesize", 
-       x = "Breath Hold Times (sec)"
+       y = "Breath Hold Times (sec)", 
+       x = "Shoesize"
        ) + 
   theme_minimal()
 
@@ -381,12 +381,12 @@ groupedby_gender <- group_by(df, gender)
 #Scatter plot - shoesize by breath_hold grouped by gender
 
 ggplot(groupedby_gender,
-       aes(x = breath_hold, y = shoesize, shape = gender)) +
+       aes(x = shoesize, y = breath_hold, shape = gender)) +
   geom_point(size = 2) +
   geom_smooth(method = lm) +
-  labs(title = "Scatter plot - shoesize by breath_hold Seperated by gender", 
-       y = "Shoesize", 
-       x = "Breath Hold Times (sec)"
+  labs(title = "Scatter Plot - shoesize by breath_hold Seperated by gender", 
+       y = "Breath Hold Times (sec)", 
+       x = "Shoesize"
        ) +
   theme_minimal()
 
@@ -395,6 +395,8 @@ ggplot(groupedby_gender,
 
 Explain your results in plain terms here: 
 
+The Scatter Plot - shoesize by breath_hold shows how long partisipants were able to hold their breath on the x-axis and what shoesize they use on the y-axis. The trent in the scatter plot seems to be, that bigger shoesize corelates with being able to hold your breath longer, though many of the data points lays far away from the line, for example the person with the largest shoesize was one of the poorest at holding their breath. This means that the line is not very explanatory of the data.
 
+Bonus question:
 
-
+The Scatter plot - shoesize by breath_hold Seperated by gender shows how long partisipants were able to hold their breath on the x-axis and what shoesize they use on the y-axis, but this time the data has been separated into males and females. In these two groups we see two different trends. For the females it seems that there is a corelation between larger shoesize and being able to hold ones breath longer. For the males the breath hold times seem to not vary when the shoesize change. 
